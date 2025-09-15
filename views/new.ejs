@@ -1,0 +1,124 @@
+<section class="card border-0 shadow-soft aurora" data-aos="fade-up">
+  <div class="card-body p-4">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-bolt me-2 text-brand"></i>Buat Live Baru</h3>
+
+    <form id="liveForm" class="row g-4 ajax-form" method="post" action="/api/live" enctype="multipart/form-data">
+      <div class="col-12 col-md-6">
+        <label class="form-label fw-semibold">Mode Tujuan</label>
+        <select name="mode" id="mode" class="form-select form-select-lg">
+          <option value="youtube" selected>YouTube (OAuth)</option>
+          <option value="custom">Custom RTMP</option>
+        </select>
+      </div>
+
+      <div id="ytBlock" class="col-12 col-md-6">
+        <label class="form-label fw-semibold">Pilih Akun YouTube</label>
+        <select name="account_id" class="form-select">
+          <% if (accounts.length === 0) { %>
+            <option value="">(Belum terhubung) — buka halaman Accounts</option>
+          <% } else { %>
+            <% accounts.forEach(a => { %>
+              <option value="<%= a.id %>"><%= a.label || ('Account '+a.id) %></option>
+            <% }) %>
+          <% } %>
+        </select>
+        <div class="form-text">Kelola di <a href="/accounts">Accounts</a>.</div>
+      </div>
+
+      <div id="rtmpBlock" class="col-12" style="display:none">
+        <label class="form-label fw-semibold">Custom RTMP URL</label>
+        <input name="custom_rtmp" class="form-control" placeholder="rtmp://.../streamKey">
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label class="form-label fw-semibold">Judul</label>
+        <input type="text" name="title" class="form-control form-control-lg" placeholder="Judul live" required>
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label fw-semibold">Privasi</label>
+        <select name="privacy" class="form-select form-select-lg">
+          <option value="public">Public</option>
+          <option value="unlisted" selected>Unlisted</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">Deskripsi</label>
+        <textarea name="description" class="form-control" rows="4" placeholder="Deskripsi live (opsional)"></textarea>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">Pilih Video</label>
+        <input type="file" name="video" accept="video/*" class="form-control" required>
+        <div class="form-text">Format: MP4/MKV/WEBM. Maks 6GB.</div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label class="form-label fw-semibold">Jadwal Tayang</label>
+        <input type="datetime-local" name="schedule_time" class="form-control">
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" name="auto_start" value="1" id="autoStart">
+          <label class="form-check-label" for="autoStart">Mulai otomatis saat jadwal</label>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="progress rounded-pill bg-dark-subtle" style="height:18px;">
+          <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">0%</div>
+        </div>
+      </div>
+
+      <div class="col-12 d-flex gap-3">
+        <button class="btn btn-brand btn-lg" type="submit"><i class="fa-solid fa-play me-2"></i>Mulai</button>
+        <button id="btnReset" class="btn btn-ghost btn-lg" type="button"><i class="fa-solid fa-rotate me-2"></i>Reset</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+(() => {
+  const mode = document.getElementById('mode');
+  const yt = document.getElementById('ytBlock');
+  const rtmp = document.getElementById('rtmpBlock');
+  function toggle(){ if (mode.value==='youtube'){ yt.style.display='block'; rtmp.style.display='none'; } else { yt.style.display='none'; rtmp.style.display='block'; } }
+  mode.addEventListener('change', toggle); toggle();
+
+  // upload progress
+  const form = document.getElementById('liveForm');
+  const bar = document.getElementById('progressBar');
+  const btnReset = document.getElementById('btnReset');
+  btnReset.addEventListener('click', ()=>{ bar.style.width='0%'; bar.textContent='0%'; form.reset(); toggle(); });
+
+  // override ajax-form default to add progress
+  $(form).off('submit').on('submit', function(e){
+    e.preventDefault();
+    const fd = new FormData(form);
+    window.__showLoader && __showLoader();
+    $.ajax({
+      url: '/api/live', method:'POST', data: fd, processData:false, contentType:false,
+      xhr: function(){
+        const xhr = $.ajaxSettings.xhr();
+        if (xhr.upload) xhr.upload.addEventListener('progress', function(ev){
+          if (ev.lengthComputable) {
+            const pct = ev.loaded/ev.total*100;
+            bar.style.width = pct.toFixed(1)+'%';
+            bar.textContent = pct.toFixed(0)+'%';
+          }
+        });
+        return xhr;
+      },
+      success: function(res){
+        window.__hideLoader && __hideLoader();
+        if (res.ok && res.redirect){ toastr.success('Upload selesai'); setTimeout(()=>location.href=res.redirect, 600); }
+        else { toastr.error(res.error || 'Gagal'); }
+      },
+      error: function(xhr){
+        window.__hideLoader && __hideLoader();
+        try{ toastr.error(JSON.parse(xhr.responseText).error || 'Error'); }catch{ toastr.error('Error'); }
+      }
+    });
+  });
+})();
+</script>
