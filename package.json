@@ -1,0 +1,31 @@
+{
+  "name": "yt-live-pro",
+  "version": "1.0.0",
+  "description": "YouTube Live from file with OAuth, FFmpeg, Scheduler, Admin Panel, MySQL",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "aos": "^2.3.4",
+    "bcrypt": "^5.1.1",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-ejs-layouts": "^2.7.0",
+    "express-rate-limit": "^7.2.0",
+    "express-session": "^1.17.3",
+    "googleapis": "^132.0.0",
+    "mkdirp": "^3.0.1",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.7",
+    "node-cron": "^3.0.3",
+    "socket.io": "^4.7.5",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
