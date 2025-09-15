@@ -1,0 +1,74 @@
+<% if (payment) { %>
+  <!-- Invoice tampilan sederhana (dipakai saat register) -->
+  <section class="card shadow-soft border-0" data-aos="fade-up">
+    <div class="card-body text-center">
+      <h3 class="fw-bold mb-2"><i class="fa-solid fa-receipt me-2"></i>Invoice Pembayaran</h3>
+      <p>Paket: <b><%= payment.paket==='weekly'?'1 Minggu':'1 Bulan' %></b> — Total: <b>Rp <%= payment.amount.toLocaleString() %></b></p>
+      <% if (settings?.qris_image) { %>
+        <img src="<%= settings.qris_image %>" class="img-fluid rounded border" style="max-width:260px">
+      <% } else if (settings?.qris_payload) { %>
+        <div class="alert alert-dark mt-3">QRIS Payload: <code><%= settings.qris_payload %></code></div>
+      <% } else { %>
+        <div class="alert alert-warning mt-3">QRIS belum disetting admin.</div>
+      <% } %>
+      <div class="text-muted-2 mt-3 small">Setelah transfer, admin akan verifikasi pembayaranmu.</div>
+    </div>
+  </section>
+<% } else { %>
+
+<section class="row g-4" data-aos="fade-up">
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-soft h-100">
+      <div class="card-body">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-signal text-brand me-2"></i>Info Stream</h5>
+        <p><b>ID:</b> <span class="mono"><%= job.id %></span></p>
+        <p><b>Status:</b> <span id="statusText" class="badge bg-dark"><%= job.status %></span></p>
+        <p><b>Dibuat:</b> <%= new Date(job.created_at).toLocaleString() %></p>
+        <p><b>Mulai:</b> <%= job.started_at ? new Date(job.started_at).toLocaleString() : '-' %></p>
+        <p><b>Selesai:</b> <span id="endedAt"><%= job.ended_at ? new Date(job.ended_at).toLocaleString() : '-' %></span></p>
+
+        <div class="d-grid gap-2 mt-3">
+          <form class="ajax-form" method="post" action="/api/stop/<%= job.id %>">
+            <button class="btn btn-danger"><i class="fa-solid fa-stop me-2"></i>Stop Stream</button>
+          </form>
+          <a href="/new" class="btn btn-brand"><i class="fa-solid fa-plus me-2"></i>Live Baru</a>
+          <a href="/" class="btn btn-ghost"><i class="fa-solid fa-arrow-left me-2"></i>Kembali</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-soft h-100">
+      <div class="card-body">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-terminal text-brand me-2"></i>Logs</h5>
+        <pre id="logBox" class="logbox"><% (job.logs||[]).forEach(l=>{ %><%= l %>\n<% }) %></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(() => {
+  const jobId = "<%= job.id %>";
+  const logBox = document.getElementById('logBox');
+  const statusText = document.getElementById('statusText');
+  const endedAt = document.getElementById('endedAt');
+
+  const sock = io();
+  sock.emit('join', jobId);
+  sock.on('log', line => {
+    logBox.textContent += line + "\n";
+    logBox.scrollTop = logBox.scrollHeight;
+    if (line.toLowerCase().includes('exited') || line.toLowerCase().includes('dihentikan')) {
+      fetch('/api/status/'+jobId).then(r=>r.json()).then(d=>{
+        if (d.ok) {
+          statusText.textContent = d.status;
+          if (d.ended_at) endedAt.textContent = new Date(d.ended_at).toLocaleString();
+        }
+      });
+    }
+  });
+})();
+</script>
+<% } %>
