@@ -1,0 +1,42 @@
+<section class="hero card border-0 shadow-soft mb-4" data-aos="fade-up">
+  <div class="card-body p-4">
+    <h3 class="fw-bold mb-1"><i class="fa-solid fa-gauge-high me-2 text-primary"></i>Admin Dashboard</h3>
+    <p class="text-muted-2 m-0">Ringkasan sistem</p>
+  </div>
+</section>
+
+<div class="row g-3" data-aos="fade-up" data-aos-delay="50">
+  <div class="col-12 col-md-6 col-lg-3"><div class="card card-hover p-3"><div class="small text-muted-2">Total Users</div><div class="fs-3 fw-bold"><%= metrics.total_users %></div></div></div>
+  <div class="col-12 col-md-6 col-lg-3"><div class="card card-hover p-3"><div class="small text-muted-2">Akun Tersambung</div><div class="fs-3 fw-bold"><%= metrics.total_accounts %></div></div></div>
+  <div class="col-12 col-md-6 col-lg-3"><div class="card card-hover p-3"><div class="small text-muted-2">Job Aktif</div><div class="fs-3 fw-bold"><%= metrics.active_jobs %></div></div></div>
+  <div class="col-12 col-md-6 col-lg-3"><div class="card card-hover p-3"><div class="small text-muted-2">Terjadwal</div><div class="fs-3 fw-bold"><%= metrics.scheduled_jobs %></div></div></div>
+</div>
+
+<section class="card mt-4" data-aos="fade-up">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="m-0">Live Jobs Terbaru</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>ID</th><th>User</th><th>Judul</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <tbody>
+          <% jobs.forEach(j => { %>
+            <tr>
+              <td class="mono"><%= j.id.slice(0,8) %></td>
+              <td><%= j.user_email %></td>
+              <td class="text-truncate" style="max-width:320px"><%= j.title %></td>
+              <td><span class="badge bg-<%= j.status==='streaming'?'success':(j.status==='scheduled'?'warning':'secondary') %>"><%= j.status %></span></td>
+              <td><%= new Date(j.created_at).toLocaleString() %></td>
+              <td class="text-end">
+                <form class="d-inline ajax-form" method="post" action="/admin/jobs/<%= j.id %>/stop">
+                  <button class="btn btn-sm btn-danger"><i class="fa-solid fa-stop"></i></button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
