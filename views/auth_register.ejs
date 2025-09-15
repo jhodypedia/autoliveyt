@@ -1,0 +1,30 @@
+<section class="card border-0 shadow-soft" data-aos="fade-up">
+  <div class="card-body p-4">
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-user-plus me-2"></i>Register & Pilih Paket</h3>
+    <form method="post" action="/register" class="row g-3">
+      <div class="col-12 col-md-6">
+        <label class="form-label">Email</label>
+        <input class="form-control" name="email" type="email" required>
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label">Password</label>
+        <input class="form-control" name="password" type="password" required>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Nama</label>
+        <input class="form-control" name="name" type="text">
+      </div>
+      <div class="col-12">
+        <label class="form-label">Paket</label>
+        <select class="form-select" name="paket" required>
+          <option value="weekly">1 Minggu - Rp30.000</option>
+          <option value="monthly">1 Bulan - Rp80.000</option>
+        </select>
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-brand">Register</button>
+        <a href="/login" class="btn btn-ghost">Sudah punya akun</a>
+      </div>
+    </form>
+  </div>
+</section>
