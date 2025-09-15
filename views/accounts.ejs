@@ -1,0 +1,23 @@
+<section class="card shadow-soft border-0" data-aos="fade-up">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h3 class="fw-bold m-0"><i class="fa-brands fa-youtube text-danger me-2"></i>Akun YouTube</h3>
+      <a href="/connect/google" class="btn btn-brand"><i class="fa-brands fa-google me-2"></i>Connect Google</a>
+    </div>
+
+    <% if (!accounts.length) { %>
+      <div class="alert alert-dark border-dashed">Belum ada akun tersambung.</div>
+    <% } else { %>
+      <div class="list-group">
+        <% accounts.forEach(a => { %>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div><i class="fa-brands fa-youtube me-2 text-danger"></i><%= a.label || ('Account '+a.id) %></div>
+            <form method="post" action="/accounts/<%= a.id %>/delete" onsubmit="return confirm('Hapus akun ini?')">
+              <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
