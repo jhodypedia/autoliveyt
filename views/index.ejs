@@ -1,0 +1,43 @@
+<section class="hero card border-0 shadow-soft mb-4" data-aos="fade-up">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <h3 class="fw-bold mb-1"><i class="fa-solid fa-house me-2 text-primary"></i>Dashboard</h3>
+        <div class="text-muted-2">Halo, <%= user?.email %>. Kelola live stream kamu di sini.</div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/new" class="btn btn-brand"><i class="fa-solid fa-bolt me-2"></i>New Live</a>
+        <a href="/accounts" class="btn btn-ghost"><i class="fa-solid fa-user-gear me-2"></i>Accounts</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card" data-aos="fade-up" data-aos-delay="50">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h5 class="m-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Riwayat</h5>
+      <span class="text-muted-2 small">Maks 50 terakhir</span>
+    </div>
+    <% if (!list.length) { %>
+      <div class="alert alert-dark border-dashed">Belum ada job.</div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>ID</th><th>Judul</th><th>Status</th><th>Dibuat</th><th></th></tr></thead>
+          <tbody>
+          <% list.forEach(j=>{ %>
+            <tr>
+              <td class="mono"><%= j.id.slice(0,8) %></td>
+              <td class="text-truncate" style="max-width:420px"><%= j.title %></td>
+              <td><span class="badge bg-<%= j.status==='streaming'?'success':(j.status==='scheduled'?'warning':'secondary') %>"><%= j.status %></span></td>
+              <td><%= new Date(j.created_at).toLocaleString() %></td>
+              <td class="text-end"><a class="btn btn-sm btn-ghost" href="/status/<%= j.id %>">Detail</a></td>
+            </tr>
+          <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</section>
